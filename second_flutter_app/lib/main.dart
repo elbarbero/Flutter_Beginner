@@ -43,41 +43,93 @@ class RandomWords extends StatefulWidget {
 
 class RandomWordsState extends State<RandomWords> {
   //AQUI GUARDAMOS EL ESTADO DEL WIDGET
-  final _suggestions = <WordPair>[]; //el guión bajo de "_suggestions" indica que es una variable privada
-  final _biggerFont = const TextStyle(fontSize: 18);
+  final _suggestions = <
+      WordPair>[]; //el guión bajo de "_suggestions" indica que es una variable privada
+  final _saved = Set<WordPair>();
+  final _biggerFont = const TextStyle(fontSize: 18.0);
+
   @override
   Widget build(BuildContext context) {
     //final wordPair = new WordPair.random(); //objeto del paquete english_words
     return Scaffold(
       appBar: AppBar(
         title: Text('Startup Name Generator'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.list),
+            onPressed: _pushSaved,
+          )
+        ],
       ),
       body: _buildSuggestions(),
     );
+  }
+
+  void _pushSaved() {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      //ESTO CREA UN NUEVO LAYOUT. EN FLUTTER SE LLAMAN ROUTE (RUTAS)
+      final tiles = _saved.map((pair) {
+        return ListTile(
+          title: Text(
+            pair.asPascalCase,
+            style: _biggerFont,
+          ),
+        );
+      });
+
+      final divided =
+          ListTile.divideTiles(context: context, tiles: tiles).toList();
+
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Saved Suggestion'),
+        ),
+        body: ListView(
+          children: divided,
+        ),
+      );
+    }));
   }
 
   Widget _buildSuggestions() {
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
       itemBuilder: (context, i) {
-        if(i.isOdd){//si es impar..
+        if (i.isOdd) {
+          //si es impar..
           return Divider();
         }
         if (i >= _suggestions.length) {
           _suggestions.addAll(
               generateWordPairs().take(10)); //añade 10 palabras a la lista
         }
-        final index = i~/2;
+        final index = i ~/ 2;
         return _buildRow(_suggestions[index]);
       },
     );
   }
 
   Widget _buildRow(WordPair pair) {
+    final alreadySaved = _saved.contains(pair);
     return ListTile(
-      title: Text(pair.asPascalCase,
-      style: _biggerFont,
+      title: Text(
+        pair.asPascalCase,
+        style: _biggerFont,
       ),
+      trailing: Icon(
+        alreadySaved ? Icons.favorite : Icons.favorite_border,
+        color: alreadySaved ? Colors.red : null,
+      ),
+      onTap: () {
+        //cuando hace clic en el widget
+        setState(() {
+          if (alreadySaved) {
+            _saved.remove(pair);
+          } else {
+            _saved.add(pair);
+          }
+        });
+      },
     );
   }
 }
