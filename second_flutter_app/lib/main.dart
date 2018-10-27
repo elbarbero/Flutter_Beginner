@@ -29,7 +29,13 @@ class MyApp extends StatelessWidget {
   //ESTE WIDGET NO GUARDA LOS VALORES NI EL ESTADO DURANTE SU EJECUCIÓN
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'Welcome to Flutter', home: RandomWords());
+    return MaterialApp(
+        debugShowCheckedModeBanner: false, //quitar el banner que pone 'debug'
+        title: 'Welcome to Flutter',
+        theme: ThemeData(
+          primaryColor: Colors.green,
+        ),
+        home: RandomWords());
   }
 }
 
@@ -46,7 +52,7 @@ class RandomWordsState extends State<RandomWords> {
   final _suggestions = <
       WordPair>[]; //el guión bajo de "_suggestions" indica que es una variable privada
   final _saved = Set<WordPair>();
-  final _biggerFont = const TextStyle(fontSize: 18.0);
+  final _biggerFont = const TextStyle(fontSize: 28.0);
 
   @override
   Widget build(BuildContext context) {
@@ -118,15 +124,16 @@ class RandomWordsState extends State<RandomWords> {
       ),
       trailing: Icon(
         alreadySaved ? Icons.favorite : Icons.favorite_border,
+        //si esta guardada: Icons.favorite sino: Icons.favorite_border,
         color: alreadySaved ? Colors.red : null,
       ),
       onTap: () {
         //cuando hace clic en el widget
         setState(() {
           if (alreadySaved) {
-            _saved.remove(pair);
+            _saved.remove(pair); //para quitar de favoritos
           } else {
-            _saved.add(pair);
+            _saved.add(pair); //para añadir a favoritos
           }
         });
       },
